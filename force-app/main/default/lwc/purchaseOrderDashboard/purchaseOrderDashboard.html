@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title="Purchase Order Dashboard" icon-name="standard:dashboard">
+        <div class="slds-p-around_medium">
+            <lightning-button label="Refresh Metrics" onclick={refresh}></lightning-button>
+            <template if:true={metrics}>
+                <div class="slds-grid slds-wrap slds-m-top_medium">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-around_small">
+                        <p class="label">Open Amount</p>
+                        <p class="value">{openAmount}</p>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-around_small">
+                        <p class="label">Overdue Orders</p>
+                        <p class="value">{overdueCount}</p>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-p-around_small">
+                        <p class="label">Current Month Amount</p>
+                        <p class="value">{currentMonthAmount}</p>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
