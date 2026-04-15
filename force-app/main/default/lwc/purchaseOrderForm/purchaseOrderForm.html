@@ -1,0 +1,38 @@
+<template>
+    <lightning-card title="Purchase Order Form" icon-name="custom:custom63">
+        <div class="slds-m-around_medium">
+            <lightning-combobox
+                name="vendorSelection"
+                label="Select Vendor"
+                value=""
+                placeholder="Select Vendor">
+                <template for:each={vendors} for:item="vendor">
+                    <option key={vendor.id} value={vendor.id}>{vendor.name}</option>
+                </template>
+            </lightning-combobox>
+            <template for:each={lineItems} for:item="item">
+                <div key={item.id} class="line-item">
+                    <lightning-input
+                        label="Product"
+                        value={item.product}
+                        onchange={handleProductChange}>
+                    </lightning-input>
+                    <lightning-input
+                        label="Quantity"
+                        type="number"
+                        value={item.quantity}
+                        onchange={handleQuantityChange}>
+                    </lightning-input>
+                    <lightning-input
+                        label="Price"
+                        type="number"
+                        value={item.price}
+                        onchange={handlePriceChange}>
+                    </lightning-input>
+                </div>
+            </template>
+            <lightning-button label="Add Line Item" onclick={addLineItem}></lightning-button>
+            <lightning-button label="Submit Order" variant="brand" onclick={submitOrder}></lightning-button>
+        </div>
+    </lightning-card>
+</template>
