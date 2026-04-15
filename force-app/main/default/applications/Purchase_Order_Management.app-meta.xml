@@ -8,5 +8,7 @@
     <tabs>standard-home</tabs>
     <tabs>Purchase_Order__c</tabs>
     <tabs>Purchase_Order_Line__c</tabs>
+    <tabs>Request_For_Proposal__c</tabs>
+    <tabs>Request_For_Quotation__c</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

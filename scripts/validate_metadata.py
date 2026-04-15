@@ -35,6 +35,8 @@ def run() -> int:
     errors.extend(assert_exists(FORCE_APP / "main/default/objects/Purchase_Order_Line__c/Purchase_Order_Line__c.object-meta.xml", "purchase order line object"))
     errors.extend(assert_exists(FORCE_APP / "main/default/classes/PurchaseOrderService.cls", "service class"))
     errors.extend(assert_exists(FORCE_APP / "main/default/lwc/purchaseOrderManager/purchaseOrderManager.js", "manager LWC"))
+    errors.extend(assert_exists(FORCE_APP / "main/default/objects/Request_For_Proposal__c/Request_For_Proposal__c.object-meta.xml", "rfp object"))
+    errors.extend(assert_exists(FORCE_APP / "main/default/objects/Request_For_Quotation__c/Request_For_Quotation__c.object-meta.xml", "rfq object"))
 
     if errors:
         print("Metadata validation failed:")

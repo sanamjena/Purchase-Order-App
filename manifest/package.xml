@@ -14,6 +14,8 @@
     <types>
         <members>Purchase_Order__c</members>
         <members>Purchase_Order_Line__c</members>
+        <members>Request_For_Quotation__c</members>
+        <members>Request_For_Proposal__c</members>
         <name>CustomObject</name>
     </types>
     <types>

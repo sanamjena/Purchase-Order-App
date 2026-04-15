@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Request for Quotation records linked to approved RFPs and used for supplier pricing comparisons.</description>
+    <enableActivities>true</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>true</enableFeeds>
+    <enableHistory>true</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <label>Request for Quotation</label>
+    <nameField>
+        <displayFormat>RFQ-{00000}</displayFormat>
+        <label>RFQ Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Requests for Quotation</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

@@ -38,6 +38,10 @@ A Salesforce DX application for managing Purchase Orders from request through re
 - Lightning app: **Purchase Order Management**
 - Tabs for both custom objects
 - Permission set: **Purchase_Order_Manager**
+- Approval workflow support (submit/approve/reject) through Apex + LWC actions
+- Budget governance with remaining-budget and over-budget KPIs
+- RFP → RFQ → Purchase Order conversion process for strategic sourcing
+- Experience Cloud user distribution for RFP outreach with send tracking
 
 ### Guardrails
 - Validation rule: expected delivery cannot be before order date
@@ -123,6 +127,7 @@ sf apex run test --target-org targetOrg --tests PurchaseOrderServiceTest,Purchas
 - Add `purchaseOrderManager` and `purchaseOrderDashboard` to your Home/App pages via Lightning App Builder.
 - Create list views by status (e.g., Submitted, Ordered, Overdue) for purchasing teams.
 - Add approval process and email notifications if your org requires formal purchasing approvals.
+- Define RFP and RFQ approval ownership by department for audit readiness.
 
 ---
 
