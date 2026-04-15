@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Total_Amount__c</fullName>
+    <description>Total amount including tax and shipping less discounts.</description>
+    <formula>BLANKVALUE(Subtotal_Amount__c, 0) + BLANKVALUE(Tax_Amount__c, 0) + BLANKVALUE(Shipping_Amount__c, 0) - BLANKVALUE(Discount_Amount__c, 0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Total Amount</label>
+    <precision>16</precision>
+    <scale>2</scale>
+    <type>Currency</type>
+</CustomField>
