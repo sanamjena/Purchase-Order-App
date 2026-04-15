@@ -1,0 +1,35 @@
+.purchase-order-form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.purchase-order-form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.purchase-order-form input,
+.purchase-order-form select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.purchase-order-form button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.purchase-order-form button:hover {
+    background-color: #218838;
+}

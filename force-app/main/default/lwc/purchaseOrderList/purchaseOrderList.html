@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Purchase Order List" icon-name="custom:custom63">
+        <template if:true={purchaseOrders}>
+            <lightning-datatable
+                key-field="id"
+                data={purchaseOrders}
+                columns={columns}
+                hide-checkbox-column
+            ></lightning-datatable>
+        </template>
+        <template if:false={purchaseOrders}>
+            <div class="slds-p-around_medium">
+                <p>No purchase orders available.</p>
+            </div>
+        </template>
+    </lightning-card>
+</template>

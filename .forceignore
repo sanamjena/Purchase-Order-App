@@ -1,0 +1,12 @@
+# Patterns to exclude during Salesforce deployment
+*.log
+*.tmp
+*.class
+*.jar
+*.zip
+*.json
+*.txt
+*.csv
+*.xml
+*.properties
+*.log.*
