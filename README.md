@@ -1,64 +1,133 @@
-# Purchase Order Management App
+# Purchase Order Management App (Salesforce)
 
-## Overview
-This Purchase Order Management App allows users to efficiently manage purchase orders, track inventory, and analyze spending patterns. The application is designed to streamline the procurement process from order creation to approval and management.
+A Salesforce DX application for managing Purchase Orders from request through receipt, including line-item pricing, approval-friendly statuses, and operational KPI visibility.
 
-## Application Architecture
-The app follows a modular architecture to promote maintainability and ease of development. The key components include:
-1. **Frontend**: Built with React, the frontend provides a user-friendly interface for interacting with purchase orders.
-2. **Backend**: The backend is developed using Node.js with Express.js, providing APIs to handle order management.
-3. **Database**: Data is stored in MongoDB, allowing for efficient querying and data management.
-4. **Authentication**: User authentication is managed via JWT tokens ensuring secure access to the application.
-5. **Testing**: Unit and integration tests are implemented to ensure code quality and reliability.
+---
 
-## Features
-- **User Management**: Role-based access control for managing user permissions.
-- **Order Creation**: Create and manage purchase orders, including item descriptions and quantities.
-- **Order Tracking**: Monitor order status from creation to completion.
-- **Inventory Management**: Keep track of stock levels and alert users of low inventory.
-- **Reporting**: Generate reports on spending, order frequency, and supplier performance.
+## What this project includes
 
-## Deployment Instructions
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/sanamjena/Purchase-Order-App.git
-   cd Purchase-Order-App
-   ```
+### Data model
+- `Purchase_Order__c` (parent object)
+  - Supplier details
+  - Requester
+  - Lifecycle status
+  - Order and delivery dates
+  - Tax, shipping, discount
+  - Rollup and formula-based totals
+- `Purchase_Order_Line__c` (child object)
+  - Master-detail to purchase order
+  - Product/SKU
+  - Quantity and unit price
+  - Calculated line total
 
-2. **Set Up Environment Variables**:
-   Create a `.env` file in the root directory with the following variables:
-   ```
-   PORT=5000
-   MONGODB_URI=<your_mongodb_connection_string>
-   JWT_SECRET=<your_jwt_secret>
-   ```
+### Business logic
+- `PurchaseOrderService` (Apex)
+  - Query purchase orders and line items
+  - Create/update orders and line items
+  - Basic business validation
+  - Dashboard metrics aggregation
+- `PurchaseOrderController` (Apex)
+  - `@AuraEnabled` endpoints for Lightning Web Components
 
-3. **Install Dependencies**:
-   Install required dependencies for both frontend and backend:
-   ```bash
-   npm install
-   cd client
-   npm install
-   ```
+### User experience
+- `purchaseOrderManager` LWC
+  - Create and review purchase orders
+  - Select an order and add line items
+- `purchaseOrderDashboard` LWC
+  - KPI summary for open amount, overdue count, and current-month value
+- Lightning app: **Purchase Order Management**
+- Tabs for both custom objects
+- Permission set: **Purchase_Order_Manager**
 
-4. **Run the Application**:
-   Start the server and client:
-   ```bash
-   npm run dev
-   ```
-   The application will be available at `http://localhost:5000`.
+### Guardrails
+- Validation rule: expected delivery cannot be before order date
+- Validation rule: line quantity must be greater than zero
+- Validation rule: closed orders require positive total amount
 
-## Usage Guidelines
-- **Login**: Users must log in with their credentials to access the application.
-- **Creating an Order**: Navigate to the "Create Order" section, fill in the required details, and submit.
-- **Viewing Orders**: Users can view all orders in the "Orders" section of the application.
-- **Integrating with Suppliers**: Use the "Suppliers" tab to manage supplier information and sync orders.
+---
 
-## Contributing
-Contributions to the project are welcome! Please submit a pull request with your proposed changes. Make sure to follow the coding standards and ensure your changes include relevant tests.
+## Prerequisites
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- A Salesforce org (Developer, Sandbox, or Scratch Org)
+- [Salesforce CLI (`sf`)](https://developer.salesforce.com/tools/salesforcecli)
+- Access to assign permission sets in the target org
 
-## Contact
-For any questions or issues, please reach out to the repository owner at sanamjena.
+---
+
+## Project structure
+
+```text
+force-app/main/default/
+  applications/        # Lightning app
+  classes/             # Apex services/controllers/tests
+  lwc/                 # Lightning Web Components
+  objects/             # Custom objects, fields, validation rules, list views
+  permissionsets/      # Permission set metadata
+  tabs/                # Object tabs
+manifest/package.xml   # Manifest-based deployment support
+scripts/validate_metadata.py
+```
+
+---
+
+## Deployment
+
+### 1) Authorize your org
+
+```bash
+sf org login web --alias targetOrg
+```
+
+### 2) Deploy source format metadata
+
+```bash
+sf project deploy start --target-org targetOrg --source-dir force-app
+```
+
+### 3) (Optional) Deploy using package manifest
+
+```bash
+sf project deploy start --target-org targetOrg --manifest manifest/package.xml
+```
+
+### 4) Assign permission set
+
+```bash
+sf org assign permset --target-org targetOrg --name Purchase_Order_Manager
+```
+
+### 5) Open the app
+
+From App Launcher, open **Purchase Order Management**.
+
+---
+
+## Local validation and testing
+
+### Metadata sanity checks (local)
+
+```bash
+python scripts/validate_metadata.py
+```
+
+### Apex unit tests (in org)
+
+```bash
+sf apex run test --target-org targetOrg --tests PurchaseOrderServiceTest,PurchaseOrderControllerTest --code-coverage --result-format human
+```
+
+---
+
+## Post-deployment setup suggestions
+
+- Add `purchaseOrderManager` and `purchaseOrderDashboard` to your Home/App pages via Lightning App Builder.
+- Create list views by status (e.g., Submitted, Ordered, Overdue) for purchasing teams.
+- Add approval process and email notifications if your org requires formal purchasing approvals.
+
+---
+
+## Notes
+
+- This package is **unmanaged metadata** intended for direct deployment in your org.
+- No external integrations are required to run the current version.
+- If Salesforce CLI is unavailable in your environment, local XML validation can still be run using `python scripts/validate_metadata.py`.

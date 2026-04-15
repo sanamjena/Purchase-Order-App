@@ -1,1 +1,12 @@
-{\n  "packageDirectories": [\n    {\n      "path": "force-app",\n      "default": true\n    }\n  ],\n  "name": "Purchase Order App",\n  "description": "Salesforce DX Project Configuration for Purchase Order App",\n  "sfdcLoginUrl": "https://login.salesforce.com",\n  "sourceApiVersion": "56.0"\n}
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true
+    }
+  ],
+  "name": "PurchaseOrderManagementApp",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "61.0"
+}
