@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description><![CDATA[Flow for handling purchase order approvals.]]></description>
+    <fullName>PurchaseOrderApprovalFlow</fullName>
+    <label>Purchase Order Approval</label>
+    <processType>Autolaunched</processType>
+    <status>Active</status>
+    <processMetadataValues>
+        <entry>
+            <key>UseActiveVersion</key>
+            <value>true</value>
+        </entry>
+    </processMetadataValues>
+    <!-- Define your approval process elements here -->
+</flow>

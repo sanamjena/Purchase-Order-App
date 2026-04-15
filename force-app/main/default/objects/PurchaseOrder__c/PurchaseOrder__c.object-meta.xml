@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <objects>
+        <customObject xmlns="http://soap.sforce.com/2006/04/metadata">
+            <fullName>PurchaseOrder__c</fullName>
+            <label>Purchase Order</label>
+            <pluralLabel>Purchase Orders</pluralLabel>
+            <nameField>
+                <label>Order Number</label>
+                <type>Text</type>
+            </nameField>
+            <deploymentStatus>Deployed</deploymentStatus>
+            <sharingModel>ReadWrite</sharingModel>
+            <fields>
+                <fullName>OrderNumber__c</fullName>
+                <label>Order Number</label>
+                <type>Text</type>
+                <required>true</required>
+            </fields>
+            <fields>
+                <fullName>Vendor__c</fullName>
+                <label>Vendor</label>
+                <type>Lookup</type>
+                <relationshipLabel>Vendor</relationshipLabel>
+                <referenceTo>Vendor__c</referenceTo>
+                <required>false</required>
+            </fields>
+            <fields>
+                <fullName>OrderDate__c</fullName>
+                <label>Order Date</label>
+                <type>Date</type>
+                <required>true</required>
+            </fields>
+            <fields>
+                <fullName>TotalAmount__c</fullName>
+                <label>Total Amount</label>
+                <type>Currency</type>
+                <required>true</required>
+            </fields>
+            <fields>
+                <fullName>Status__c</fullName>
+                <label>Status</label>
+                <type>Picklist</type>
+                <picklistValues>
+                    <value>Pending</value>
+                    <value>Approved</value>
+                    <value>Rejected</value>
+                    <value>Completed</value>
+                </picklistValues>
+                <required>true</required>
+            </fields>
+            <fields>
+                <fullName>Description__c</fullName>
+                <label>Description</label>
+                <type>LongTextArea</type>
+                <required>false</required>
+            </fields>
+        </customObject>
+    </objects>
+</Package>
