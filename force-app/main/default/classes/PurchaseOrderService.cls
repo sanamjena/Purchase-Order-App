@@ -69,6 +69,8 @@ public with sharing class PurchaseOrderService {
         po.Approval_Status__c = decision;
         if (decision == 'Approved' && po.Status__c == 'Submitted') {
             po.Status__c = 'Approved';
+        } else if (decision == 'Rejected' && po.Status__c == 'Submitted') {
+            po.Status__c = 'Rejected';
         }
 
         update po;
@@ -86,13 +88,10 @@ public with sharing class PurchaseOrderService {
             throw new AuraHandledException('Valid until date must be today or later.');
         }
 
-        Request_For_Proposal__c rfp = [
-            SELECT Id, Name, Title__c, Department__c, Requested_By__c, Needed_By_Date__c,
-                   Status__c, Estimated_Budget__c
-            FROM Request_For_Proposal__c
-            WHERE Id = :rfpId
-            LIMIT 1
-        ];
+        Request_For_Proposal__c rfp = getRfpById(rfpId);
+        if (rfp == null) {
+            throw new AuraHandledException('RFP not found.');
+        }
 
         if (rfp.Status__c != 'Approved' && rfp.Status__c != 'Under Review') {
             throw new AuraHandledException('Only approved or under-review RFPs can be converted to RFQ.');
@@ -107,13 +106,17 @@ public with sharing class PurchaseOrderService {
             Status__c = 'Sent',
             Evaluation_Notes__c = 'Created from RFP ' + rfp.Name
         );
+        ensureCreateAccess(Schema.sObjectType.Request_For_Quotation__c, 'RFQ');
+        rfq = (Request_For_Quotation__c) sanitizeForCreate(rfq);
         insert rfq;
 
         rfp.Status__c = 'Converted to RFQ';
+        ensureUpdateAccess(Schema.sObjectType.Request_For_Proposal__c, 'RFP');
+        rfp = (Request_For_Proposal__c) sanitizeForUpdate(rfp);
         update rfp;
 
         return [
-            SELECT Id, Name, Request_For_Proposal__c, Supplier_Name__c, Supplier_Email__c,
+            SELECT Id, Name, Request_For_Proposal__c, Request_For_Proposal__r.Department__c, Supplier_Name__c, Supplier_Email__c,
                    Quote_Amount__c, Valid_Until__c, Status__c, Purchase_Order__c
             FROM Request_For_Quotation__c
             WHERE Id = :rfq.Id
@@ -128,20 +131,23 @@ public with sharing class PurchaseOrderService {
         if (String.isBlank(requesterName)) {
             throw new AuraHandledException('Requester is required to create PO from RFQ.');
         }
+        if (expectedDeliveryDate == null || expectedDeliveryDate < Date.today()) {
+            throw new AuraHandledException('Expected delivery date must be today or later.');
+        }
 
-        Request_For_Quotation__c rfq = [
-            SELECT Id, Name, Request_For_Proposal__c, Supplier_Name__c, Supplier_Email__c,
-                   Quote_Amount__c, Valid_Until__c, Status__c, Purchase_Order__c
-            FROM Request_For_Quotation__c
-            WHERE Id = :rfqId
-            LIMIT 1
-        ];
+        Request_For_Quotation__c rfq = getRfqById(rfqId);
+        if (rfq == null) {
+            throw new AuraHandledException('RFQ not found.');
+        }
 
         if (rfq.Status__c != 'Selected' && rfq.Status__c != 'Quoted') {
             throw new AuraHandledException('Only selected or quoted RFQs can be converted to Purchase Orders.');
         }
         if (rfq.Purchase_Order__c != null) {
             throw new AuraHandledException('RFQ is already linked to a Purchase Order.');
+        }
+        if (rfq.Quote_Amount__c == null || rfq.Quote_Amount__c <= 0) {
+            throw new AuraHandledException('RFQ quote amount must be greater than zero for PO conversion.');
         }
 
         Purchase_Order__c po = new Purchase_Order__c(
@@ -154,12 +160,14 @@ public with sharing class PurchaseOrderService {
             Order_Date__c = Date.today(),
             Expected_Delivery_Date__c = expectedDeliveryDate,
             Budget_Amount__c = rfq.Quote_Amount__c,
-            Department__c = 'Procurement'
+            Department__c = rfq.Request_For_Proposal__r == null ? 'Procurement' : rfq.Request_For_Proposal__r.Department__c
         );
-        savePurchaseOrder(po);
+        po = savePurchaseOrder(po);
 
         rfq.Purchase_Order__c = po.Id;
         rfq.Status__c = 'Converted to PO';
+        ensureUpdateAccess(Schema.sObjectType.Request_For_Quotation__c, 'RFQ');
+        rfq = (Request_For_Quotation__c) sanitizeForUpdate(rfq);
         update rfq;
 
         return queryPurchaseOrder(po.Id);
@@ -173,22 +181,20 @@ public with sharing class PurchaseOrderService {
             throw new AuraHandledException('At least one Experience Cloud user is required.');
         }
 
-        Request_For_Proposal__c rfp = [
-            SELECT Id, Name, Title__c, Status__c, Distribution_Status__c,
-                   Last_Distribution_Date__c, Distribution_Notes__c
-            FROM Request_For_Proposal__c
-            WHERE Id = :rfpId
-            LIMIT 1
-        ];
+        Request_For_Proposal__c rfp = getRfpForDistribution(rfpId);
+        if (rfp == null) {
+            throw new AuraHandledException('RFP not found.');
+        }
 
         if (rfp.Status__c != 'Approved' && rfp.Status__c != 'Under Review' && rfp.Status__c != 'Submitted') {
             throw new AuraHandledException('RFP must be Submitted, Under Review, or Approved before distribution.');
         }
 
+        Set<Id> uniqueUserIds = new Set<Id>(userIds);
         List<User> targets = [
             SELECT Id, Name, Email, IsActive, IsPortalEnabled
             FROM User
-            WHERE Id IN :userIds
+            WHERE Id IN :uniqueUserIds
               AND IsActive = true
               AND Email != null
         ];
@@ -215,8 +221,7 @@ public with sharing class PurchaseOrderService {
         for (User target : targets) {
             Messaging.SingleEmailMessage msg = new Messaging.SingleEmailMessage();
             msg.setTargetObjectId(target.Id);
-            msg.setSaveAsActivity(true);
-            msg.setWhatId(rfp.Id);
+            msg.setSaveAsActivity(false);
             msg.setSubject('New RFP Available: ' + rfp.Name);
             msg.setPlainTextBody(messageBody + '\n\nPlease review this RFP in Experience Cloud.');
             emails.add(msg);
@@ -245,6 +250,8 @@ public with sharing class PurchaseOrderService {
             rfp.Distribution_Status__c = 'Failed';
             rfp.Distribution_Notes__c = 'Distribution failed for all recipients.';
         }
+        ensureUpdateAccess(Schema.sObjectType.Request_For_Proposal__c, 'RFP');
+        rfp = (Request_For_Proposal__c) sanitizeForUpdate(rfp);
         update rfp;
 
         return new Map<String, Object>{
@@ -269,11 +276,13 @@ public with sharing class PurchaseOrderService {
             if (!Schema.sObjectType.Purchase_Order_Line__c.isCreateable()) {
                 throw new AuraHandledException('Insufficient access to create purchase order lines.');
             }
+            lineItem = (Purchase_Order_Line__c) sanitizeForCreate(lineItem);
             insert lineItem;
         } else {
             if (!Schema.sObjectType.Purchase_Order_Line__c.isUpdateable()) {
                 throw new AuraHandledException('Insufficient access to update purchase order lines.');
             }
+            lineItem = (Purchase_Order_Line__c) sanitizeForUpdate(lineItem);
             update lineItem;
         }
 
@@ -350,6 +359,40 @@ public with sharing class PurchaseOrderService {
         return metrics;
     }
 
+    private static Request_For_Proposal__c getRfpById(Id rfpId) {
+        List<Request_For_Proposal__c> records = [
+            SELECT Id, Name, Title__c, Department__c, Requested_By__c, Needed_By_Date__c,
+                   Status__c, Estimated_Budget__c
+            FROM Request_For_Proposal__c
+            WHERE Id = :rfpId
+            LIMIT 1
+        ];
+        return records.isEmpty() ? null : records[0];
+    }
+
+    private static Request_For_Proposal__c getRfpForDistribution(Id rfpId) {
+        List<Request_For_Proposal__c> records = [
+            SELECT Id, Name, Title__c, Status__c, Distribution_Status__c,
+                   Last_Distribution_Date__c, Distribution_Notes__c
+            FROM Request_For_Proposal__c
+            WHERE Id = :rfpId
+            LIMIT 1
+        ];
+        return records.isEmpty() ? null : records[0];
+    }
+
+    private static Request_For_Quotation__c getRfqById(Id rfqId) {
+        List<Request_For_Quotation__c> records = [
+            SELECT Id, Name, Request_For_Proposal__c, Request_For_Proposal__r.Department__c,
+                   Supplier_Name__c, Supplier_Email__c, Quote_Amount__c,
+                   Valid_Until__c, Status__c, Purchase_Order__c
+            FROM Request_For_Quotation__c
+            WHERE Id = :rfqId
+            LIMIT 1
+        ];
+        return records.isEmpty() ? null : records[0];
+    }
+
     private static Purchase_Order__c queryPurchaseOrder(Id purchaseOrderId) {
         if (purchaseOrderId == null) {
             return null;
@@ -373,11 +416,13 @@ public with sharing class PurchaseOrderService {
             if (!Schema.sObjectType.Purchase_Order__c.isCreateable()) {
                 throw new AuraHandledException('Insufficient access to create purchase orders.');
             }
+            purchaseOrder = (Purchase_Order__c) sanitizeForCreate(purchaseOrder);
             insert purchaseOrder;
         } else {
             if (!Schema.sObjectType.Purchase_Order__c.isUpdateable()) {
                 throw new AuraHandledException('Insufficient access to update purchase orders.');
             }
+            purchaseOrder = (Purchase_Order__c) sanitizeForUpdate(purchaseOrder);
             update purchaseOrder;
         }
     }
@@ -394,6 +439,28 @@ public with sharing class PurchaseOrderService {
         }
         if (purchaseOrder.Order_Date__c == null) {
             purchaseOrder.Order_Date__c = Date.today();
+        }
+    }
+
+    private static SObject sanitizeForCreate(SObject record) {
+        List<SObject> sanitized = Security.stripInaccessible(AccessType.CREATABLE, new List<SObject>{record}).getRecords();
+        return sanitized[0];
+    }
+
+    private static SObject sanitizeForUpdate(SObject record) {
+        List<SObject> sanitized = Security.stripInaccessible(AccessType.UPDATABLE, new List<SObject>{record}).getRecords();
+        return sanitized[0];
+    }
+
+    private static void ensureCreateAccess(Schema.SObjectType objectType, String label) {
+        if (!objectType.isCreateable()) {
+            throw new AuraHandledException('Insufficient access to create ' + label + ' records.');
+        }
+    }
+
+    private static void ensureUpdateAccess(Schema.SObjectType objectType, String label) {
+        if (!objectType.isUpdateable()) {
+            throw new AuraHandledException('Insufficient access to update ' + label + ' records.');
         }
     }
 

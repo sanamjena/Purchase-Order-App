@@ -42,6 +42,7 @@ A Salesforce DX application for managing Purchase Orders from request through re
 - Budget governance with remaining-budget and over-budget KPIs
 - RFP → RFQ → Purchase Order conversion process for strategic sourcing
 - Experience Cloud user distribution for RFP outreach with send tracking
+- Analytics package with reports, dashboard, and chart-ready list views
 
 ### Guardrails
 - Validation rule: expected delivery cannot be before order date

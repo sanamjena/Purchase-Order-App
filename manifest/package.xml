@@ -27,5 +27,23 @@
         <members>purchaseOrderManager</members>
         <name>LightningComponentBundle</name>
     </types>
+    <types>
+        <members>Purchase_Order_Analytics/Purchase_Order_Pipeline</members>
+        <members>Purchase_Order_Analytics/RFP_to_RFQ_Funnel</members>
+        <members>Purchase_Order_Analytics/RFQ_Comparison</members>
+        <name>Report</name>
+    </types>
+    <types>
+        <members>Purchase_Order_Analytics</members>
+        <name>ReportFolder</name>
+    </types>
+    <types>
+        <members>Purchase_Order_Analytics/Purchase_Order_Command_Center</members>
+        <name>Dashboard</name>
+    </types>
+    <types>
+        <members>Purchase_Order_Analytics</members>
+        <name>DashboardFolder</name>
+    </types>
     <version>61.0</version>
 </Package>

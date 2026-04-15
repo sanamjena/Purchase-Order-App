@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>Request_For_Quotation__c.NAME</columns>
+    <columns>Request_For_Quotation__c.Request_For_Proposal__c</columns>
+    <columns>Request_For_Quotation__c.Supplier_Name__c</columns>
+    <columns>Request_For_Quotation__c.Quote_Amount__c</columns>
+    <columns>Request_For_Quotation__c.Valid_Until__c</columns>
+    <columns>Request_For_Quotation__c.Status__c</columns>
+    <description>Supplier quote comparison across active RFQs.</description>
+    <filter>
+        <booleanFilter>1</booleanFilter>
+        <criteriaItems>
+            <column>Request_For_Quotation__c.Status__c</column>
+            <operator>notEqual</operator>
+            <value>Closed</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>None</dateGranularity>
+        <field>Request_For_Quotation__c.Status__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>RFQ Comparison</name>
+    <reportType>Request_For_Quotation__c</reportType>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Request_For_Quotation__c.CreatedDate</dateColumn>
+        <interval>INTERVAL:CURRENT FY</interval>
+    </timeFrameFilter>
+</Report>
