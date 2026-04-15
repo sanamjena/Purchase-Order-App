@@ -78,6 +78,25 @@ private class PurchaseOrderServiceTest {
     }
 
     @IsTest
+    static void testRejectedDecisionUpdatesLifecycleStatus() {
+        Purchase_Order__c po = PurchaseOrderService.savePurchaseOrder(new Purchase_Order__c(
+            Supplier_Name__c = 'Rejected Supplier',
+            Requester__c = 'Approver User',
+            Order_Date__c = Date.today(),
+            Expected_Delivery_Date__c = Date.today().addDays(4),
+            Budget_Amount__c = 1000
+        ));
+
+        Test.startTest();
+        PurchaseOrderService.submitForApproval(po.Id);
+        Purchase_Order__c rejected = PurchaseOrderService.setApprovalDecision(po.Id, 'Rejected');
+        Test.stopTest();
+
+        System.assertEquals('Rejected', rejected.Approval_Status__c, 'Expected rejected approval status.');
+        System.assertEquals('Rejected', rejected.Status__c, 'Expected lifecycle status to move to Rejected.');
+    }
+
+    @IsTest
     static void testRfpToRfqToPoConversionFlow() {
         Request_For_Proposal__c rfp = new Request_For_Proposal__c(
             Title__c = 'Enterprise Laptops',
