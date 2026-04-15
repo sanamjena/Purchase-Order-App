@@ -1,0 +1,33 @@
+.purchase-order-list {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.purchase-order-list h1 {
+    color: #0070f3;
+}
+
+.purchase-order-list .order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+}
+
+.purchase-order-list .order-item:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.purchase-order-list .order-status {
+    font-weight: bold;
+}
+
+.purchase-order-list .order-date {
+    color: #888;
+}
+
+/* Add hover effect */
+.purchase-order-list .order-item:hover {
+    background-color: #e9ecef;
+}
