@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Overdue__c</fullName>
+    <description>Indicates order is overdue and still not closed/cancelled.</description>
+    <formula>AND(
+NOT(ISBLANK(Expected_Delivery_Date__c)),
+Expected_Delivery_Date__c &lt; TODAY(),
+NOT(ISPICKVAL(Status__c, 'Closed')),
+NOT(ISPICKVAL(Status__c, 'Cancelled'))
+)</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Is Overdue</label>
+    <type>Checkbox</type>
+</CustomField>

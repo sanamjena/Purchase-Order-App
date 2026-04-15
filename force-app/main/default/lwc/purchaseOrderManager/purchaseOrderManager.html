@@ -1,0 +1,63 @@
+<template>
+    <lightning-card title="Purchase Order Manager" icon-name="custom:custom63">
+        <div class="slds-p-around_medium">
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input label="Supplier Name" value={draft.Supplier_Name__c} data-field="Supplier_Name__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input label="Requester" value={draft.Requester__c} data-field="Requester__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input label="Department" value={draft.Department__c} data-field="Department__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input type="email" label="Supplier Email" value={draft.Supplier_Email__c} data-field="Supplier_Email__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-combobox label="Status" value={draft.Status__c} options={statusOptions} data-field="Status__c" onchange={handleInput}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-combobox label="Priority" value={draft.Priority__c} options={priorityOptions} data-field="Priority__c" onchange={handleInput}></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input type="number" label="Budget Amount" value={draft.Budget_Amount__c} data-field="Budget_Amount__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                    <lightning-input type="date" label="Expected Delivery" value={draft.Expected_Delivery_Date__c} data-field="Expected_Delivery_Date__c" onchange={handleInput}></lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <div class="slds-m-top_medium">
+                <lightning-button label="Save Purchase Order" variant="brand" onclick={saveOrder}></lightning-button>
+                <lightning-button label="Submit for Approval" class="slds-m-left_small" onclick={submitApproval} disabled={disableApprovalActions}></lightning-button>
+                <lightning-button label="Approve" class="slds-m-left_small" onclick={approveOrder} disabled={disableApprovalActions}></lightning-button>
+                <lightning-button label="Reject" class="slds-m-left_small" onclick={rejectOrder} disabled={disableApprovalActions}></lightning-button>
+            </div>
+        </div>
+
+        <template if:true={orders.length}>
+            <lightning-datatable key-field="Id" data={orders} columns={columns} hide-checkbox-column onrowaction={handleRowAction}></lightning-datatable>
+        </template>
+
+        <template if:true={selectedOrderId}>
+            <div class="slds-p-around_medium">
+                <h3 class="slds-text-heading_small slds-m-bottom_small">Add Line Item</h3>
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                        <lightning-input label="Product Name" value={draftLine.Product_Name__c} data-field="Product_Name__c" onchange={handleLineInput}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" medium-device-size="4" class="slds-p-around_x-small">
+                        <lightning-input label="SKU" value={draftLine.SKU__c} data-field="SKU__c" onchange={handleLineInput}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" medium-device-size="2" class="slds-p-around_x-small">
+                        <lightning-input type="number" label="Quantity" value={draftLine.Quantity__c} data-field="Quantity__c" onchange={handleLineInput}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" medium-device-size="2" class="slds-p-around_x-small">
+                        <lightning-input type="number" label="Unit Price" value={draftLine.Unit_Price__c} data-field="Unit_Price__c" onchange={handleLineInput}></lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+                <lightning-button label="Save Line" variant="neutral" onclick={saveLine}></lightning-button>
+            </div>
+        </template>
+    </lightning-card>
+</template>

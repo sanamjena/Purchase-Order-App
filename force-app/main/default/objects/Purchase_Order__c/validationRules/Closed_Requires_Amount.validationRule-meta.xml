@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <description>Closed orders should have a positive total.</description>
+    <errorConditionFormula>AND(ISPICKVAL(Status__c, 'Closed'), BLANKVALUE(Total_Amount__c, 0) &lt;= 0)</errorConditionFormula>
+    <errorMessage>Closed purchase orders must have a total amount greater than zero.</errorMessage>
+</ValidationRule>
