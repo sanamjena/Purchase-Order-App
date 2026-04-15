@@ -78,13 +78,13 @@ private class PurchaseOrderServiceTest {
     }
 
     @IsTest
-    static void testRejectedDecisionUpdatesLifecycleStatus() {
+    static void testRejectedApprovalSetsRejectedLifecycleStatus() {
         Purchase_Order__c po = PurchaseOrderService.savePurchaseOrder(new Purchase_Order__c(
             Supplier_Name__c = 'Rejected Supplier',
             Requester__c = 'Approver User',
             Order_Date__c = Date.today(),
             Expected_Delivery_Date__c = Date.today().addDays(4),
-            Budget_Amount__c = 1000
+            Budget_Amount__c = 800
         ));
 
         Test.startTest();
@@ -93,7 +93,7 @@ private class PurchaseOrderServiceTest {
         Test.stopTest();
 
         System.assertEquals('Rejected', rejected.Approval_Status__c, 'Expected rejected approval status.');
-        System.assertEquals('Rejected', rejected.Status__c, 'Expected lifecycle status to move to Rejected.');
+        System.assertEquals('Rejected', rejected.Status__c, 'Expected rejected lifecycle status.');
     }
 
     @IsTest

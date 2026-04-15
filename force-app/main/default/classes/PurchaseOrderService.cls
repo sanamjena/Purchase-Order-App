@@ -69,7 +69,7 @@ public with sharing class PurchaseOrderService {
         po.Approval_Status__c = decision;
         if (decision == 'Approved' && po.Status__c == 'Submitted') {
             po.Status__c = 'Approved';
-        } else if (decision == 'Rejected' && po.Status__c == 'Submitted') {
+        } else if (decision == 'Rejected') {
             po.Status__c = 'Rejected';
         }
 
